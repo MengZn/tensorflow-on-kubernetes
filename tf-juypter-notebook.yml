@@ -1,0 +1,62 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: tf-juypter-notebook
+  labels:
+    tf-app: tf-juypter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      tf-app: tf-juypter
+  template:
+    metadata:
+      labels:
+        tf-app: tf-juypter
+        name: tf-juypter-notebook
+    spec:
+      containers:
+      - image: tensorflow/tensorflow
+        name: tf-juypter-notebook
+        command:
+        - "/run_jupyter.sh"
+        args:
+        - "--allow-root"
+        - "--NotebookApp.token='$(TOKEN)'"
+        env:
+        - name: TOKEN
+          valueFrom:
+            configMapKeyRef:
+              name: tf-config
+              key: juypter.notebook.token
+        ports:
+        - containerPort: 8888
+          name: j-book
+          protocol: TCP
+        volumeMounts:
+        - name: notebook
+          mountPath: /notebooks/
+        - name: logs
+          mountPath: /logs/
+      volumes:
+      - name: notebook
+        persistentVolumeClaim:
+          claimName: tf-jbook-pvc
+      - name: logs
+        persistentVolumeClaim:
+          claimName: tf-logs-pvc
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: tf-juypter-notebook-service
+spec:
+  selector:
+    tf-app: tf-juypter
+  externalIPs:
+  - 10.20.0.136
+  ports:
+    - protocol: TCP
+      port: 8888
+      name: j-book
+  type: NodePort
