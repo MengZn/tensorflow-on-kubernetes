@@ -31,8 +31,6 @@ spec:
               key: juypter.notebook.token
         ports:
         - containerPort: 8888
-          name: j-book
-          protocol: TCP
         volumeMounts:
         - name: notebook
           mountPath: /notebooks/
