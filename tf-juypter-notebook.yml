@@ -3,16 +3,16 @@ apiVersion: extensions/v1beta1
 metadata:
   name: tf-juypter-notebook
   labels:
-    tf-app: tf-juypter
+    tf-app: tf-j-book
 spec:
   replicas: 1
   selector:
     matchLabels:
-      tf-app: tf-juypter
+      tf-app: tf-j-book
   template:
     metadata:
       labels:
-        tf-app: tf-juypter
+        tf-app: tf-j-book
         name: tf-juypter-notebook
     spec:
       containers:
@@ -35,7 +35,7 @@ spec:
         - name: notebook
           mountPath: /notebooks/
         - name: logs
-          mountPath: /logs/
+          mountPath: /notebooks/logs/
       volumes:
       - name: notebook
         persistentVolumeClaim:
@@ -50,7 +50,7 @@ metadata:
   name: tf-juypter-notebook-service
 spec:
   selector:
-    tf-app: tf-juypter
+    tf-app: tf-j-book
   externalIPs:
   - 10.20.0.136
   ports:
