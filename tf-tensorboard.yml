@@ -1,0 +1,51 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: tf-board
+  labels:
+    tf-app: tf-board
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      tf-app: tf-board
+  template:
+    metadata:
+      labels:
+        tf-app: tf-board
+        name: tf-board
+    spec:
+      containers:
+      - image: tensorflow/tensorflow
+        name: tf-board
+        command:
+        - "tensorboard"
+        args:
+        - "--logdir"
+        - "/notebooks/logs"
+        ports:
+        - containerPort: 6006
+          name: board
+          protocol: TCP
+        volumeMounts:
+        - name: logs
+          mountPath: /notebooks/logs/
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: tf-logs-pvc
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: tf-board-service
+spec:
+  selector:
+    tf-app: tf-board
+  externalIPs:
+  - 10.20.0.136
+  ports:
+    - protocol: TCP
+      port: 6006
+      name: board
+  type: LoadBalancer
